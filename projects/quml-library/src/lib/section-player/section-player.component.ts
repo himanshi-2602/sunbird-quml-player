@@ -1,4 +1,6 @@
+import { UtilService } from './../util-service';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { UserDeclarationOperation } from '@project-sunbird/client-services/models';
 import { errorCode, errorMessage, ErrorService } from '@project-sunbird/sunbird-player-sdk-v9';
 import * as _ from 'lodash-es';
 import { CarouselComponent } from 'ngx-bootstrap/carousel';
@@ -8,7 +10,6 @@ import { QumlPlayerConfig, IParentConfig, IAttempts } from '../quml-library-inte
 import { QuestionCursor } from '../quml-question-cursor.service';
 import { ViewerService } from '../services/viewer-service/viewer-service';
 import { eventName, pageId, TelemetryType } from '../telemetry-constants';
-import { UtilService } from '../util-service';
 
 const DEFAULT_SCORE: number = 1;
 
@@ -514,7 +515,7 @@ export class SectionPlayerComponent implements OnChanges, AfterViewInit {
 
   getOptionSelected(optionSelected) {
     /* istanbul ignore else */
-    if (JSON.stringify(this.currentOptionSelected) === JSON.stringify(optionSelected)) {
+    if (optionSelected.cardinality  === "single" && JSON.stringify(this.currentOptionSelected) === JSON.stringify(optionSelected)) {
       return; // Same option selected
     }
     this.focusOnNextButton();
@@ -687,13 +688,15 @@ export class SectionPlayerComponent implements OnChanges, AfterViewInit {
       }
       if (option.cardinality === 'multiple') {
         const responseDeclaration = this.questions[currentIndex].responseDeclaration;
+        
+  
         const currentScore = this.utilService.getMultiselectScore(option.option, responseDeclaration);
         this.showAlert = true;
         if (currentScore === 0) {
           this.alertType = 'wrong';
-          this.updateScoreBoard((currentIndex + 1), 'wrong');
+          this.updateScoreBoard((currentIndex ), 'wrong');
         } else {
-          this.updateScoreBoard(((currentIndex + 1)), 'correct', undefined, currentScore);
+          this.updateScoreBoard(((currentIndex )), 'correct', undefined, currentScore);
           if (this.showFeedBack)
             this.correctFeedBackTimeOut(type);
           this.alertType = 'correct';
